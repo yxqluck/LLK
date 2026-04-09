@@ -10,6 +10,7 @@
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+#include "CGame.h"
 
 
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
@@ -64,7 +65,7 @@ BEGIN_MESSAGE_MAP(CLLKDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	ON_BN_CLICKED(IDC_BUTTON1, &CLLKDlg::OnBnClickedButton1)
+	ON_BN_CLICKED(IDC_BUTTON_BASIC, &CLLKDlg::OnBnClickedButtonBasic)
 END_MESSAGE_MAP()
 
 
@@ -160,11 +161,6 @@ HCURSOR CLLKDlg::OnQueryDragIcon()
 }
 
 
-void CLLKDlg::OnBnClickedButton1()
-{
-	// TODO: 在此添加控件通知处理程序代码
-}
-
 void CLLKDlg::InitBackground() {
 	//加载位图
 	CBitmap bmpMain;
@@ -176,4 +172,14 @@ void CLLKDlg::InitBackground() {
 
 	//将位图选进DC
 	m_dcMem.SelectObject(&bmpMain);
+}
+void CLLKDlg::OnBnClickedButtonBasic()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	this->ShowWindow(SW_HIDE);
+
+	CGame gameDlg;
+	gameDlg.DoModal();
+
+	this->ShowWindow(SW_SHOW);
 }

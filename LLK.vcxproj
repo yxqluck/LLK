@@ -185,6 +185,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CGame.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="LLK.h" />
     <ClInclude Include="LLKDlg.h" />
@@ -193,6 +194,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CGame.cpp" />
     <ClCompile Include="LLK.cpp" />
     <ClCompile Include="LLKDlg.cpp" />
     <ClCompile Include="pch.cpp">
@@ -211,6 +213,7 @@
   <ItemGroup>
     <Image Include="res\LLK.ico" />
     <Image Include="res\llk_main.bmp" />
+    <Image Include="theme\picture\fruit_bg.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
