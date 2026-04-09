@@ -21,12 +21,17 @@ protected:
 	HICON m_hIcon;
 	CDC m_dcMem;
     CBitmap m_bmpMain;
+	CDC m_dcElement;
+	CDC m_dcMask;
+	int m_anMap[4][4];
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
 	void InitBackground();
+	void InitElement();
 	afx_msg void OnPaint();
 
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual BOOL OnInitDialog();
+	afx_msg void OnBnClickedButtonStart();
 };
