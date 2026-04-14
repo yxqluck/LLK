@@ -186,7 +186,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CGame.h" />
+    <ClInclude Include="CGameControl.h" />
+    <ClInclude Include="CGameLogic.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="global.h" />
     <ClInclude Include="LLK.h" />
     <ClInclude Include="LLKDlg.h" />
     <ClInclude Include="pch.h" />
@@ -195,6 +198,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CGame.cpp" />
+    <ClCompile Include="CGameControl.cpp" />
+    <ClCompile Include="CGameLogic.cpp" />
     <ClCompile Include="LLK.cpp" />
     <ClCompile Include="LLKDlg.cpp" />
     <ClCompile Include="pch.cpp">

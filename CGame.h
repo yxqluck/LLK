@@ -1,5 +1,7 @@
 ﻿#pragma once
 #include "afxdialogex.h"
+#include "global.h"
+#include "CGameControl.h"
 
 
 // CGame 对话框
@@ -21,17 +23,37 @@ protected:
 	HICON m_hIcon;
 	CDC m_dcMem;
     CBitmap m_bmpMain;
+    CDC m_dcBg; // DC that holds the original background bitmap
+	CBitmap m_bmpMem; // bitmap selected into m_dcMem (back buffer)
 	CDC m_dcElement;
 	CDC m_dcMask;
-	int m_anMap[4][4];
+    CRect m_rtGameRect;
+  int m_anMap[MAP_ROWS][MAP_COLS];
+	CPoint m_ptGameTop;
+	CSize m_sizeElem;
+	bool m_bFirstPoint;
+	Vertex m_ptSelFirst;
+	Vertex m_ptSelSec;
+
+	CGameControl m_gameControl;
+
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
 	void InitBackground();
 	void InitElement();
+	void OnLButtonUp(UINT nFlags, CPoint point);
+    void DrawTipFrame(int nRow, int nCol);
+	bool IsLink();
+	void DrawTipLine(Vertex avPath[], int pathLen);
+	void UpdateMap();
 	afx_msg void OnPaint();
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnBnClickedButtonStart();
+    enum { ID_LINE_TIMER = 1 };
 };
+
+
