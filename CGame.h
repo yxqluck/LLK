@@ -35,6 +35,9 @@ protected:
 	Vertex m_ptSelFirst;
 	Vertex m_ptSelSec;
 
+	bool flag;
+	bool pointFlag;
+
 	CGameControl m_gameControl;
 
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
@@ -46,6 +49,7 @@ protected:
 	bool IsLink();
 	void DrawTipLine(Vertex avPath[], int pathLen);
 	void UpdateMap();
+	void OverGame();
 	afx_msg void OnPaint();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 
@@ -54,6 +58,10 @@ public:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnBnClickedButtonStart();
     enum { ID_LINE_TIMER = 1 };
+	afx_msg void OnBnClickedButtonBack();
+	afx_msg void OnBnClickedButtonPoint();
+protected:
+	void dfs(Vertex begin);
 };
 
 

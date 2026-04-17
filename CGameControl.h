@@ -11,8 +11,9 @@ public:
 	void SetFirstPoint(int nRow, int nCol);
 	void SetSectPoint(int nRow, int nCol);
     bool Link(Vertex avPath[], int &pathLen);
+	int m_anMap[MAP_ROWS][MAP_COLS];
 private:
-    int m_anMap[MAP_ROWS][MAP_COLS];
+    
 	Vertex m_ptSelFirst;
 	Vertex m_ptSelSec;
 };

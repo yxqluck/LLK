@@ -5,10 +5,10 @@ typedef struct Vertex
 	int col;
 	int info;
 } Vertex;
-// map size
+// µØÍ¼¹æ¸ñ
 #define MAP_ROWS 8
-#define MAP_COLS 8
+#define MAP_COLS 14
 
 #define BLANK -1
-// number of distinct tile images available in the element sprite (0..NUM_IMAGES-1)
+
 #define NUM_IMAGES 10

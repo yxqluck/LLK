@@ -6,6 +6,7 @@
 #include "framework.h"
 #include "afxdialogex.h"
 #include "CGame.h"
+#include "CGameLogic.h" 
 
 
 // CGame 对话框
@@ -35,7 +36,7 @@ void CGame::OnTimer(UINT_PTR nIDEvent)
 {
 	if (nIDEvent == ID_LINE_TIMER) {
 		KillTimer(ID_LINE_TIMER);
-		// restore area (clears the line) and redraw map
+		// 恢复区域（清除连线）并重绘地图
 		UpdateMap();
 	} else {
 		CDialogEx::OnTimer(nIDEvent);
@@ -117,6 +118,8 @@ BEGIN_MESSAGE_MAP(CGame, CDialogEx)
   ON_WM_LBUTTONUP()
 	ON_WM_TIMER()
 	ON_BN_CLICKED(IDC_BUTTON_START, &CGame::OnBnClickedButtonStart)
+	ON_BN_CLICKED(IDC_BUTTON_BACK, &CGame::OnBnClickedButtonBack)
+	ON_BN_CLICKED(IDC_BUTTON_POINT, &CGame::OnBnClickedButtonPoint)
 END_MESSAGE_MAP()
 
 
@@ -160,12 +163,12 @@ void CGame::InitElement() {
 }
 
 void CGame::UpdateMap() {
+	
 	int nLeft = m_ptGameTop.x;
 	int nTop = m_ptGameTop.y;
 	int nElemW = m_sizeElem.cx;
 	int nElemH = m_sizeElem.cy;
-    // Restore the background for the game area from the original background DC
-	// so removed elements are cleared before drawing current map.
+    // 从原始背景 DC 恢复游戏区域的背景，以便删除的元素被清除，然后绘制当前地图
 	m_dcMem.BitBlt(
 		m_rtGameRect.left, m_rtGameRect.top,
 		m_rtGameRect.Width(), m_rtGameRect.Height(),
@@ -175,7 +178,7 @@ void CGame::UpdateMap() {
     for (int i = 0; i < MAP_ROWS; i++) {
 		for (int j = 0; j < MAP_COLS; j++) {
 			int nInfo = m_gameControl.GetElement(i, j);
-			// skip empty slots marked as -1
+			// 跳过标记为 -1 的空格子
 			if (nInfo < 0)
 				continue;
 			m_dcMem.BitBlt(nLeft + j * nElemW, nTop + i * nElemH, nElemW, nElemH, &m_dcMask, 0, nInfo * nElemH, SRCPAINT);
@@ -184,15 +187,18 @@ void CGame::UpdateMap() {
 	}
 
 	Invalidate(FALSE);
+	
 }
 
 void CGame::OnBnClickedButtonStart()
 {
-	//初始化游戏地图
+	// 初始化游戏地图
 
 	m_gameControl.StartGame();
 
 	UpdateMap();
+
+	GetDlgItem(IDC_BUTTON_START)->EnableWindow(FALSE);
 
 	//int nLeft = 50;
 	//int nTop = 50;
@@ -212,7 +218,7 @@ void CGame::OnBnClickedButtonStart()
 
 void CGame::OnLButtonUp(UINT nFlags, CPoint point) {
 
-	// compute row/col relative to game top-left and validate
+	// 计算相对于游戏区域左上角的行/列并验证
 	int nRow = (point.y - m_ptGameTop.y) / m_sizeElem.cy;
 	int nCol = (point.x - m_ptGameTop.x) / m_sizeElem.cx;
 
@@ -233,7 +239,7 @@ void CGame::OnLButtonUp(UINT nFlags, CPoint point) {
 
         Vertex avPath[4];
 		int pathLen = 0;
-		//判断是否为相同图片并获取连接路径
+		// 判断是否为相同图片并获取连接路径
 		if (m_gameControl.Link(avPath, pathLen)) {
 			// 清除数据并更新地图
 			UpdateMap();
@@ -243,6 +249,7 @@ void CGame::OnLButtonUp(UINT nFlags, CPoint point) {
 			// 先确保没有上一次的定时器残留
 			KillTimer(ID_LINE_TIMER);
 			SetTimer(ID_LINE_TIMER, 200, NULL);
+			OverGame();
 		}
 		else {
 			// 无连接，刷新显示
@@ -254,8 +261,7 @@ void CGame::OnLButtonUp(UINT nFlags, CPoint point) {
 }
 
 void CGame::DrawTipFrame(int nRow, int nCol) {
-    // Draw the tip frame into the memory DC so it persists across repaints,
-	// then request a repaint of the window to present the updated memory DC.
+    // 将提示框绘制到内存 DC 中，使其在重绘时保持，然后请求重绘窗口以显示更新后的内存 DC。
 	CBrush brush(RGB(233, 43, 43));
 	CRect rtTipFrame;
 	rtTipFrame.left = m_ptGameTop.x + nCol * m_sizeElem.cx;
@@ -265,17 +271,17 @@ void CGame::DrawTipFrame(int nRow, int nCol) {
 
 	if (m_dcMem.GetSafeHdc()) {
 		m_dcMem.FrameRect(&rtTipFrame, &brush);
-		// trigger repaint to blit memory DC onto the window
+		// 请求重绘以将内存 DC 的内容呈现在窗口上
 		Invalidate(FALSE);
 	} else {
-		// fallback: draw directly on window DC
+		// 回退：直接在窗口 DC 上绘制
 		CClientDC dc(this);
 		dc.FrameRect(&rtTipFrame, &brush);
 	}
 }
 
 bool CGame::IsLink() {
-    // m_ptSel*.x is column, m_ptSel*.y is row. m_anMap is indexed as [row][col].
+    // m_ptSel*.x 表示列, m_ptSel*.y 表示行。m_anMap 按 [row][col] 索引。
 	// ignore if same cell or either is already empty
 	if (m_ptSelFirst.row == m_ptSelSec.row && m_ptSelFirst.col == m_ptSelSec.col)
 		return false;
@@ -295,7 +301,7 @@ void CGame::DrawTipLine(Vertex avPath[], int pathLen) {
 	};
 
 	if (m_dcMem.GetSafeHdc()) {
-		CPen penLine(PS_SOLID, 2, RGB(0, 255, 0));
+		CPen penLine(PS_SOLID, 2, RGB(0, 0, 255));
 		CPen* pOldPen = m_dcMem.SelectObject(&penLine);
 
 		CPoint p0 = pointFor(avPath[0]);
@@ -319,4 +325,78 @@ void CGame::DrawTipLine(Vertex avPath[], int pathLen) {
 		}
 		dc.SelectObject(pOldPen);
 	}
+}
+
+void CGame::OverGame() {
+	for (int i = 0; i < MAP_ROWS; i++) {
+		for (int j = 0; j < MAP_COLS; j++) {
+			if (m_gameControl.m_anMap[i][j] >= 0) {
+				return;
+			}
+		}
+	}
+		// 游戏结束处理
+	MessageBox(L"恭喜通关！", L"提示", MB_OK);
+	GetDlgItem(IDC_BUTTON_START)->EnableWindow(TRUE);
+}
+void CGame::OnBnClickedButtonBack()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	OnBnClickedButtonStart();
+}
+
+void CGame::OnBnClickedButtonPoint()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	flag = false;
+	pointFlag = true;
+	for(int i=0; i < MAP_ROWS; i++) {
+		for(int j = 0; j < MAP_COLS; j++) {
+			if(m_gameControl.m_anMap[i][j] >= 0) {
+				Vertex v = {i, j, m_gameControl.m_anMap[i][j]};
+				dfs(v);
+				if(flag) return;
+			}
+		}
+	}
+	if (!pointFlag) {
+		MessageBox(L"当前局面无可连通目标！请重排！", L"提示", MB_OK);
+	}
+}
+
+
+void CGame::dfs(Vertex begin)
+{
+	
+	int startVal = m_gameControl.m_anMap[begin.row][begin.col];
+	if (startVal == BLANK)
+		return;
+
+	CGameLogic logic;
+	Vertex avPath[4];
+	int pathLen = 0;
+
+	// 遍历所有格子，寻找相同图案且可连通的目标
+	for (int r = 0; r < MAP_ROWS; ++r) {
+		for (int c = 0; c < MAP_COLS; ++c) {
+			// 跳过自身
+			if (r == begin.row && c == begin.col) continue;
+			// 值必须相等且不为空
+			if (m_gameControl.m_anMap[r][c] != startVal) continue;
+			Vertex candidate = { r, c, m_gameControl.m_anMap[r][c] };
+			// 调用游戏逻辑判断是否可连通
+			if (logic.IsLink(m_gameControl.m_anMap, begin, candidate, avPath, pathLen)) {
+				// 绘制提示连线（不清除元素）
+				flag = true;
+				DrawTipLine(avPath, pathLen);
+				// 启动短时定时器以便随后清除连线
+				KillTimer(ID_LINE_TIMER);
+				SetTimer(ID_LINE_TIMER, 500, NULL);
+				return;
+			}
+		}
+	}
+	// 未找到可连通目标
+	pointFlag = false;
+	return;
 }

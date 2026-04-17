@@ -13,18 +13,18 @@ CGameLogic::~CGameLogic()
 }
 
 void CGameLogic::InitMap(int anMap[][MAP_COLS]) {
-	// initialize with pairs and shuffle to fill the MAP_ROWS x MAP_COLS grid
+	// 用成对元素初始化并打乱，填满 MAP_ROWS x MAP_COLS 网格
 	int total = MAP_ROWS * MAP_COLS;
 	int pairCount = total / 2;
 
-	// Build pairCount image indices, cycling through available NUM_IMAGES
+	// 生成 pairCount 个图像索引，循环使用可用的 NUM_IMAGES
 	std::vector<int> pairs;
 	pairs.reserve(pairCount);
 	for (int i = 0; i < pairCount; ++i) {
 		pairs.push_back(i % NUM_IMAGES);
 	}
 
-	// expand to values (each image appears twice)
+	// 展开为值数组（每个图像出现两次）
 	std::vector<int> vals;
 	vals.reserve(total);
 	for (int v : pairs) {
@@ -32,7 +32,7 @@ void CGameLogic::InitMap(int anMap[][MAP_COLS]) {
 		vals.push_back(v);
 	}
 
-	// shuffle values
+	// 随机打乱值
 	std::random_device rd;
 	std::mt19937 g(rd());
 	std::shuffle(vals.begin(), vals.end(), g);
@@ -61,7 +61,7 @@ bool CGameLogic::IsLink(int anMap[][MAP_COLS],Vertex v1, Vertex v2, Vertex avPat
 	return (val1 == val2);*/
 
     pathLen = 0;
-	//一条直线联通
+	// 一条直线联通
 	int nRow1 = v1.row;
 	int nRow2 = v2.row;
 	int nCol1 = v1.col;
@@ -76,12 +76,12 @@ bool CGameLogic::IsLink(int anMap[][MAP_COLS],Vertex v1, Vertex v2, Vertex avPat
 			avPath[0] = v1; avPath[1] = v2; pathLen = 2; return true;
 		}
 	}
-	//两条直线联通
+	// 两条直线联通
     if (LinkInTwoLine(anMap, v1, v2, avPath, pathLen)) {
 		return true;
 	}
 
-	//三条直线联通
+	// 三条直线联通
     if(LinkInThreeLine(anMap, v1, v2, avPath, pathLen)) {
 		return true;
 	}
@@ -100,7 +100,7 @@ bool CGameLogic::LinkInRow(int anMap[][MAP_COLS], Vertex v1, Vertex v2) {
 	int c1 = v1.col;
 	int c2 = v2.col;
 	if (row != v2.row) return false;
-	if (c1 == c2) return true; // same cell (handled elsewhere)
+	if (c1 == c2) return true; // 同一单元格（在别处处理）
 	if (c1 > c2) {
 		int temp = c1;
 		c1 = c2;
@@ -130,15 +130,15 @@ bool CGameLogic::LinkInCol(int anMap[][MAP_COLS], Vertex v1, Vertex v2) {
 }
 
 bool CGameLogic::LinkInTwoLine(int anMap[][MAP_COLS], Vertex v1, Vertex v2, Vertex avPath[], int &pathLen) {
-    // One-turn (L-shaped) connection: check two possible corners
-	// corner at (v1.row, v2.col)
+    // 一次拐弯（L 形）连接：检查两种可能的拐角
+	// 拐角在 (v1.row, v2.col)
 	Vertex corner1 = { v1.row, v2.col, anMap[v1.row][v2.col] };
 	if (anMap[corner1.row][corner1.col] == BLANK) {
         if (LinkInRow(anMap, v1, corner1) && LinkInCol(anMap, corner1, v2)) {
 			avPath[0]=v1; avPath[1]=corner1; avPath[2]=v2; pathLen=3; return true;
 		}
 	}
-	// corner at (v2.row, v1.col)
+	// 拐角在 (v2.row, v1.col)
 	Vertex corner2 = { v2.row, v1.col, anMap[v2.row][v1.col] };
 	if (anMap[corner2.row][corner2.col] == BLANK) {
         if (LinkInCol(anMap, v1, corner2) && LinkInRow(anMap, corner2, v2)) {
@@ -149,8 +149,8 @@ bool CGameLogic::LinkInTwoLine(int anMap[][MAP_COLS], Vertex v1, Vertex v2, Vert
 }
 
 bool CGameLogic::LinkInThreeLine(int anMap[][MAP_COLS], Vertex v1, Vertex v2, Vertex avPath[], int &pathLen) {
-	// Two-turn connection: try patterns scanning intermediate columns/rows
-	// Pattern A: v1 -> (v1.row, k) -> (v2.row, k) -> v2
+	// 两次拐弯连接：通过扫描中间的列/行尝试模式
+	// 模式 A：v1 -> (v1.row, k) -> (v2.row, k) -> v2
     for (int k = 0; k < MAP_COLS; ++k) {
 		Vertex p1 = { v1.row, k, anMap[v1.row][k] };
 		Vertex p2 = { v2.row, k, anMap[v2.row][k] };
@@ -159,7 +159,7 @@ bool CGameLogic::LinkInThreeLine(int anMap[][MAP_COLS], Vertex v1, Vertex v2, Ve
 			avPath[0]=v1; avPath[1]=p1; avPath[2]=p2; avPath[3]=v2; pathLen=4; return true;
 		}
 	}
-	// Pattern B: v1 -> (k, v1.col) -> (k, v2.col) -> v2
+	// 模式 B：v1 -> (k, v1.col) -> (k, v2.col) -> v2
     for (int k = 0; k < MAP_ROWS; ++k) {
 		Vertex p1 = { k, v1.col, anMap[k][v1.col] };
 		Vertex p2 = { k, v2.col, anMap[k][v2.col] };
