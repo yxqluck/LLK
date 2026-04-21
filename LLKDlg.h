@@ -36,4 +36,5 @@ protected:
 	void InitBackground();
 public:
 	afx_msg void OnBnClickedButtonBasic();
+	afx_msg void OnBnClickedButtonRank();
 };

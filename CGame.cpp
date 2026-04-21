@@ -7,6 +7,8 @@
 #include "afxdialogex.h"
 #include "CGame.h"
 #include "CGameLogic.h" 
+#include "GameSetting.h"
+#include "GameInput.h"
 
 
 // CGame 对话框
@@ -35,10 +37,30 @@ CGame::CGame(CWnd* pParent /*=nullptr*/)
 void CGame::OnTimer(UINT_PTR nIDEvent)
 {
 	if (nIDEvent == ID_LINE_TIMER) {
+		
+
 		KillTimer(ID_LINE_TIMER);
 		// 恢复区域（清除连线）并重绘地图
 		UpdateMap();
-	} else {
+	}
+	else if (nIDEvent == 2) {
+		/*CTime time = CTime::GetCurrentTime();
+		CString strTime = time.Format(_T("%H:%M:%S"));
+
+		SetDlgItemText(IDC_STATIC_TEXT, strTime);*/
+		if (!m_bPause) {
+			m_nSecond++;
+		}
+
+		int h = m_nSecond / 3600;
+		int m = (m_nSecond % 3600) / 60;
+		int s = m_nSecond % 60;
+		CString strTime;
+		strTime.Format(_T("已用时长\n%02d:%02d:%02d"), h, m, s);
+		SetDlgItemText(IDC_STATIC_TEXT, strTime);
+
+	}
+	else {
 		CDialogEx::OnTimer(nIDEvent);
 	}
 }
@@ -120,6 +142,9 @@ BEGIN_MESSAGE_MAP(CGame, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_START, &CGame::OnBnClickedButtonStart)
 	ON_BN_CLICKED(IDC_BUTTON_BACK, &CGame::OnBnClickedButtonBack)
 	ON_BN_CLICKED(IDC_BUTTON_POINT, &CGame::OnBnClickedButtonPoint)
+	ON_BN_CLICKED(IDC_BUTTON_STOP, &CGame::OnBnClickedButtonStop)
+	ON_BN_CLICKED(IDC_BUTTON_GAMESETTING, &CGame::OnBnClickedButtonGamesetting)
+	ON_BN_CLICKED(IDC_BUTTON_BACKMAIN, &CGame::OnBnClickedButtonBackmain)
 END_MESSAGE_MAP()
 
 
@@ -133,7 +158,10 @@ BOOL CGame::OnInitDialog()
 	InitBackground();
 
 	InitElement();
-
+	
+	GetDlgItem(IDC_BUTTON_BACK)->EnableWindow(FALSE);
+	GetDlgItem(IDC_BUTTON_POINT)->EnableWindow(FALSE);
+	GetDlgItem(IDC_BUTTON_STOP)->EnableWindow(FALSE);
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// 异常: OCX 属性页应返回 FALSE
 }
@@ -199,7 +227,12 @@ void CGame::OnBnClickedButtonStart()
 	UpdateMap();
 
 	GetDlgItem(IDC_BUTTON_START)->EnableWindow(FALSE);
-
+	GetDlgItem(IDC_BUTTON_BACK)->EnableWindow(TRUE);
+	GetDlgItem(IDC_BUTTON_POINT)->EnableWindow(TRUE);
+	GetDlgItem(IDC_BUTTON_STOP)->EnableWindow(TRUE);
+	m_bPause = false;
+	m_nSecond = 0;
+	SetTimer(2, 1000, NULL);  // 设置一个定时器，ID为2，间隔为1000毫秒
 	//int nLeft = 50;
 	//int nTop = 50;
 	//int nElemW = 40;
@@ -217,6 +250,10 @@ void CGame::OnBnClickedButtonStart()
 }
 
 void CGame::OnLButtonUp(UINT nFlags, CPoint point) {
+
+	if(m_bPause) {
+		return CDialogEx::OnLButtonUp(nFlags, point);
+	}
 
 	// 计算相对于游戏区域左上角的行/列并验证
 	int nRow = (point.y - m_ptGameTop.y) / m_sizeElem.cy;
@@ -335,12 +372,33 @@ void CGame::OverGame() {
 			}
 		}
 	}
+	KillTimer(2);
 		// 游戏结束处理
-	MessageBox(L"恭喜通关！", L"提示", MB_OK);
+	/*MessageBox(L"恭喜通关！", L"提示", MB_OK);*/
+	GameInput input;
+	input.DoModal();
+	RANKTIME.push_back(m_nSecond);
 	GetDlgItem(IDC_BUTTON_START)->EnableWindow(TRUE);
+	GetDlgItem(IDC_BUTTON_BACK)->EnableWindow(FALSE);
+	GetDlgItem(IDC_BUTTON_POINT)->EnableWindow(FALSE);
+	GetDlgItem(IDC_BUTTON_STOP)->EnableWindow(FALSE);
+	GetDlgItem(IDC_STATIC_TEXT)->SetWindowText(L"已用时长\n00:00:00");
+	m_bPause = false;
+	m_nSecond = 0;
+	
+
 }
 void CGame::OnBnClickedButtonBack()
 {
+	m_bPause = false;
+	
+	GetDlgItem(IDC_BUTTON_STOP)->SetWindowText(L"暂停游戏");
+	GetDlgItem(IDC_BUTTON_POINT)->EnableWindow(TRUE);
+	
+	GetDlgItem(IDC_STATIC_TEXT)->SetWindowText(L"已用时长\n00:00:00");
+	m_bPause = false;
+	m_nSecond = 0;
+	SetTimer(2, 1000, NULL);  // 设置一个定时器，ID为2，间隔为1000毫秒
 	// TODO: 在此添加控件通知处理程序代码
 	OnBnClickedButtonStart();
 }
@@ -348,6 +406,8 @@ void CGame::OnBnClickedButtonBack()
 void CGame::OnBnClickedButtonPoint()
 {
 	// TODO: 在此添加控件通知处理程序代码
+
+
 	flag = false;
 	pointFlag = true;
 	for(int i=0; i < MAP_ROWS; i++) {
@@ -399,4 +459,40 @@ void CGame::dfs(Vertex begin)
 	// 未找到可连通目标
 	pointFlag = false;
 	return;
+}
+
+void CGame::OnDestroy()
+{
+	// TODO: 在此处添加实现代码.
+	CDialogEx::OnDestroy();
+	KillTimer(2);
+}
+
+void CGame::OnBnClickedButtonStop()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	m_bPause = !m_bPause;
+	if (m_bPause) {
+		GetDlgItem(IDC_BUTTON_STOP)->SetWindowText(L"继续游戏");
+		GetDlgItem(IDC_BUTTON_POINT)->EnableWindow(FALSE);
+	}
+	else {
+		GetDlgItem(IDC_BUTTON_STOP)->SetWindowText(L"暂停游戏");
+		GetDlgItem(IDC_BUTTON_POINT)->EnableWindow(TRUE);
+	}
+}
+
+void CGame::OnBnClickedButtonGamesetting()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	GameSetting dlg;
+	dlg.DoModal();
+}
+
+
+
+void CGame::OnBnClickedButtonBackmain()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	EndDialog(0);
 }

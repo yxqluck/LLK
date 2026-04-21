@@ -11,6 +11,7 @@
 #define new DEBUG_NEW
 #endif
 #include "CGame.h"
+#include "Rank.h"
 
 
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
@@ -66,6 +67,7 @@ BEGIN_MESSAGE_MAP(CLLKDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_BUTTON_BASIC, &CLLKDlg::OnBnClickedButtonBasic)
+	ON_BN_CLICKED(IDC_BUTTON_RANK, &CLLKDlg::OnBnClickedButtonRank)
 END_MESSAGE_MAP()
 
 
@@ -182,4 +184,12 @@ void CLLKDlg::OnBnClickedButtonBasic()
 	gameDlg.DoModal();
 
 	this->ShowWindow(SW_SHOW);
+}
+
+void CLLKDlg::OnBnClickedButtonRank()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	Rank rankDlg;
+	rankDlg.DoModal();
+
 }

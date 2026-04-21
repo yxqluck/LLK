@@ -45,6 +45,15 @@
     <ClInclude Include="CGameControl.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="GameSetting.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="GameInput.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Rank.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LLK.cpp">
@@ -63,6 +72,15 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="CGameControl.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="GameSetting.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="GameInput.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Rank.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

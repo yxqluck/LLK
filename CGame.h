@@ -28,12 +28,15 @@ protected:
 	CDC m_dcElement;
 	CDC m_dcMask;
     CRect m_rtGameRect;
-  int m_anMap[MAP_ROWS][MAP_COLS];
+    int m_anMap[MAP_ROWS][MAP_COLS];
 	CPoint m_ptGameTop;
 	CSize m_sizeElem;
 	bool m_bFirstPoint;
 	Vertex m_ptSelFirst;
 	Vertex m_ptSelSec;
+
+	int m_nSecond;
+	bool m_bPause;
 
 	bool flag;
 	bool pointFlag;
@@ -62,6 +65,12 @@ public:
 	afx_msg void OnBnClickedButtonPoint();
 protected:
 	void dfs(Vertex begin);
+	void OnDestroy();
+
+public:
+	afx_msg void OnBnClickedButtonStop();
+	afx_msg void OnBnClickedButtonGamesetting();
+	afx_msg void OnBnClickedButtonBackmain();
 };
 
 
