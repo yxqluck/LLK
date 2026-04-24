@@ -6,6 +6,7 @@
 #include "afxdialogex.h"
 #include "Rank.h"
 #include "global.h"
+#include<fstream>
 
 
 // Rank 对话框
@@ -62,7 +63,7 @@ void Rank::AddTable() {
 			}
 		}
 	}
-
+	CStdioFile file(_T("rank.txt"), CFile::modeCreate | CFile::modeWrite);
 
 	//加入表
 	for(int i = 0; i < nCount; i++) {
@@ -75,5 +76,13 @@ void Rank::AddTable() {
 		int s = RANKTIME[i] % 60;
 		str.Format(_T("%02d:%02d:%02d"), h, m, s);
 		m_listTable.SetItemText(i, 2, str);
+		
+		CString line;
+		line.Format(_T("%s %d"),RANK[i], RANKTIME[i]);
+		
+		file.WriteString(line + _T("\n"));
+
 	}
+
+	file.Close();
 }

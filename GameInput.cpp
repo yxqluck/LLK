@@ -8,9 +8,6 @@
 #include "global.h"
 
 
-std::vector<CString> RANK;
-std::vector<int> RANKTIME;
-
 // GameInput 对话框
 
 IMPLEMENT_DYNAMIC(GameInput, CDialogEx)

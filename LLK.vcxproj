@@ -229,6 +229,9 @@
     <Image Include="res\llk_main.bmp" />
     <Image Include="theme\picture\fruit_bg.bmp" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="Rank.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

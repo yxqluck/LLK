@@ -7,11 +7,15 @@
 #include "framework.h"
 #include "LLK.h"
 #include "LLKDlg.h"
-
+#include <vector>
+#include<fstream>
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
+
+std::vector<CString> RANK;
+std::vector<int> RANKTIME;
 
 // CLLKApp
 
@@ -41,6 +45,25 @@ CLLKApp theApp;
 
 BOOL CLLKApp::InitInstance()
 {
+	/*std::ifstream infile("rank.txt");
+	CString name;
+	int time;
+	while (infile >> name >> time) {
+		RANK.push_back(name);
+		RANKTIME.push_back(time);
+	}*/
+
+	CStdioFile file(_T("rank.txt"), CFile::modeRead);
+	CString line;
+
+	while (file.ReadString(line)) {
+		int spaceIndex = line.Find(' ');
+		CString name = line.Left(spaceIndex);
+		int time = _ttoi(line.Mid(spaceIndex + 1));
+		RANK.push_back(name);
+		RANKTIME.push_back(time);
+	}
+	file.Close();
 	// 如果应用程序存在以下情况，Windows XP 上需要 InitCommonControlsEx()
 	// 使用 ComCtl32.dll 版本 6 或更高版本来启用可视化方式，
 	//则需要 InitCommonControlsEx()。  否则，将无法创建窗口。
